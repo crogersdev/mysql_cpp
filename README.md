@@ -60,7 +60,6 @@ step 2: compile, link, build, and run
 ```
 $ g++ -I /usr/include/mysql-cppconn/jdbc -l mysqlcppconn -o mysql mysql.cpp -Wall -std=c++11
 $ ./mysql
-$ ./mysql
 
 Running 'SELECT 'Hello World!' AS _message'...
         ... MySQL replies: Hello World!
