@@ -20,6 +20,7 @@ mysql-connector-python.x86_64              8.0.18-1.el7                @mysql-co
 mysql-connector-python-cext.x86_64         8.0.18-1.el7                @mysql-connectors-community
 mysql-connector-python-debuginfo.x86_64    2.1.7-1.el7                 @mysql-connectors-community
 ```
+I just wound up installing all those. 
 
 step 1a: go find all the *.h files necessary for the `-I` flag in the compile part of the `g++` call
 
