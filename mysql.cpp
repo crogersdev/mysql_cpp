@@ -1,6 +1,7 @@
 /* Standard C++ includes */
 #include <stdlib.h>
 #include <iostream>
+#include <vector>
 
 /*
   Include directly the different
@@ -19,45 +20,56 @@ using namespace std;
 
 int main(void)
 {
-cout << endl;
-cout << "Running 'SELECT 'Hello World!' AS _message'..." << endl;
+  cout << endl;
 
-try {
-  sql::Driver *driver;
-  sql::Connection *con;
-  sql::Statement *stmt;
-  sql::ResultSet *res;
+  try {
+    sql::Driver *pDriver; // can't make this guy shared/unique becaues the destructor is protected.
 
-  /* Create a connection */
-  driver = get_driver_instance();
-  con = driver->connect("tcp://127.0.0.1:3306", "root", "");
-  /* Connect to the MySQL test database */
-  con->setSchema("test");
+    /* Create a connection */
+    pDriver = get_driver_instance();
+    unique_ptr<sql::Connection> pCon (pDriver->connect("tcp://127.0.0.1:3306", "root", ""));
+    /* Connect to the MySQL test database */
+    // for some reason, 'databases' are almost synonymous with 'schemas.'
+    pCon->setSchema("test");
 
-  stmt = con->createStatement();
-  res = stmt->executeQuery("SELECT 'Hello World!' AS _message");
-  while (res->next()) {
-    cout << "\t... MySQL replies: ";
-    /* Access column data by alias or column name */
-    cout << res->getString("_message") << endl;
-    cout << "\t... MySQL says it again: ";
-    /* Access column data by numeric offset, 1 is the first column */
-    cout << res->getString(1) << endl;
+    unique_ptr<sql::Statement> pStmt(pCon->createStatement());
+    unique_ptr<sql::ResultSet> pResultSet(pStmt->executeQuery("select * from cus_tbl"));
+    sql::ResultSetMetaData *pRsmd = pResultSet->getMetaData();
+    
+    // let's take a look at columns
+    vector<string> colNames = {};
+    cout << "the columns are..." << std::endl;
+    for (uint32_t i = 1; i <= pRsmd->getColumnCount(); i++)
+    {
+      string colName = pRsmd->getColumnName(i);
+      cout << colName << "\t";
+      colNames.push_back(colName);
+    }
+
+    cout << endl;
+
+    cout << "--------------------------------------------" << endl;
+
+    // there's gotta be away to determine the type of the column
+    // and then automagically know which getThing() method to call.
+    while (pResultSet->next())
+    {
+      for (const auto& colName: colNames)
+      {
+        cout << pResultSet->getString(colName) << "\t";
+      }
+      cout << endl;
+    }
+
+  } catch (sql::SQLException &e) {
+    cout << "# ERR: SQLException in " << __FILE__;
+    cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+    cout << "# ERR: " << e.what();
+    cout << " (MySQL error code: " << e.getErrorCode();
+    cout << ", SQLState: " << e.getSQLState() << " )" << endl;
   }
 
-  delete res;
-  delete stmt;
-  delete con;
+  cout << endl;
 
-} catch (sql::SQLException &e) {
-  cout << "# ERR: SQLException in " << __FILE__;
-  cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-  cout << "# ERR: " << e.what();
-  cout << " (MySQL error code: " << e.getErrorCode();
-  cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-}
-
-cout << endl;
-
-return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
