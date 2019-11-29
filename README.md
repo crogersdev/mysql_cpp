@@ -1,6 +1,6 @@
 # mysql_cpp
 
-step 0: prep work: mysql server, db setup and population, and package installation
+### step 0: prep work: mysql server, db setup and population, and package installation
 
 this was all run on centos7.  i wanted to use gcc 7, so i had to do the following:
 
@@ -52,8 +52,7 @@ mysql-connector-python-debuginfo.x86_64    2.1.7-1.el7                 @mysql-co
 ```
 I just wound up installing `sudo yum -y install mysql-connector*`
 
-
-step 1a: go find all the *.h files necessary for the `-I` flag in the compile part of the `g++` call
+### step 1a: go find all the *.h files necessary for the `-I` flag in the compile part of the `g++` call
 
 ```
 $ cd /usr/include
@@ -69,7 +68,8 @@ ok, fantastic.  since our find regex won't show us EVERYTHING in that `mysql-cpp
 
 so i wound up going with `-I /usr/include/mysql-cppconn-8/jdbc` so i could do `#include <some_file.h>` and `#include <cppconn/some_other_file.h>`
 
-step 1b: go find all the the *.so file and its associated library(ies) necessary for `-l` flags for the linker part of the `g++` call
+
+### step 1b: go find all the the *.so file and its associated library(ies) necessary for `-l` flags for the linker part of the `g++` call
 ```
 $ cd /usr
 $ find . -name '*mysql*so'
@@ -87,7 +87,8 @@ find: ‘./libexec/initscripts/legacy-actions/auditd’: Permission denied
 
 anyway, that'll be our `-l` arg, minus the `lib` part.  not sure of the relationship of names between the *.so file and the associated library...  something about `sudo ldconfig -p` and idk, google the rest.  i'd like to know so if you find out let me know, please.
 
-step 2: compile, link, build, and run
+
+### step 2: compile, link, build, and run
 
 ```
 $ g++ -I /usr/include/mysql-cppconn/jdbc -l mysqlcppconn -o mysql mysql.cpp -Wall -std=c++11
