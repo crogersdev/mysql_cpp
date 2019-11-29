@@ -1,13 +1,43 @@
 # mysql_cpp
 
-step 0: install packages...
+step 0: prep work: mysql server, db setup and population, and package installation
 
-```$ yum list installed | grep mysql
-mysql-community-client.x86_64              5.6.46-2.el7                @mysql56-community
-mysql-community-common.x86_64              5.6.46-2.el7                @mysql56-community
-mysql-community-libs.x86_64                5.6.46-2.el7                @mysql56-community
-mysql-community-release.noarch             el7-5                       installed
-mysql-community-server.x86_64              5.6.46-2.el7                @mysql56-community
+this was all run on centos7.  i wanted to use gcc 7, so i had to do the following:
+
+```
+$ sudo yum install centos-release-scl
+$ sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
+$ sudo yum install devtoolset-7
+$ scl enable devtoolset-7 $SHELL
+```
+verify that `g++ --version` shows 7+.  might be a good idea to enable devtoolset-7 in ~/.zshrc or ~/.bashrc or whatever the shell is you use.
+
+i also created a mysql database named `test`.  the db name appears to also be the schema name...  not sure how that works in mysql but also not the point of this exercise so i just accepted it and moved on.  i left the root password blank.  don't do that if you plan to leave the service up and running or if you plan to put meaningful data in there.
+
+after you install mysql the server on your system, and this writeup doesn't cover that, and connect to it.  however, for centos, i did do a `sudo yum -y install mysql-community*` then do the following:
+
+create the table:
+
+```
+CREATE TABLE cus_tbl(  
+   customer_id INT NOT NULL AUTO_INCREMENT,  
+   firstname VARCHAR(100) NOT NULL,  
+   lastname VARCHAR(100) NOT NULL,  
+   PRIMARY KEY ( customer_id )  
+); 
+```
+
+put some data in there:
+
+```
+INSERT INTO cus_tbl (firstname, lastname) VALUES ('homer', 'simpson');
+```
+
+repeat for as many entries in the table as you like.  you'll also note we skipped the `customer_id` because that's an auto increment so it'll insert itself.
+
+time to do some more package installation.  this time we'll focus on all the mysql C++ connector packages.
+
+```$ yum list installed | grep mysql-connector
 mysql-connector-c++.x86_64                 8.0.18-1.el7                @mysql-connectors-community
 mysql-connector-c++-debuginfo.x86_64       8.0.18-1.el7                @mysql-connectors-community
 mysql-connector-c++-devel.x86_64           8.0.18-1.el7                @mysql-connectors-community
@@ -20,7 +50,8 @@ mysql-connector-python.x86_64              8.0.18-1.el7                @mysql-co
 mysql-connector-python-cext.x86_64         8.0.18-1.el7                @mysql-connectors-community
 mysql-connector-python-debuginfo.x86_64    2.1.7-1.el7                 @mysql-connectors-community
 ```
-I just wound up installing all those. 
+I just wound up installing `sudo yum -y install mysql-connector*`
+
 
 step 1a: go find all the *.h files necessary for the `-I` flag in the compile part of the `g++` call
 
@@ -62,7 +93,12 @@ step 2: compile, link, build, and run
 $ g++ -I /usr/include/mysql-cppconn/jdbc -l mysqlcppconn -o mysql mysql.cpp -Wall -std=c++11
 $ ./mysql
 
-Running 'SELECT 'Hello World!' AS _message'...
-        ... MySQL replies: Hello World!
-        ... MySQL says it again: Hello World!
+the columns are...
+customer_id	firstname	lastname
+--------------------------------------------
+1	steve	holt
+2	buster	bluth
+3	bruce	wayne
+4	katherine	janeway
+5	rey	something
 ```
