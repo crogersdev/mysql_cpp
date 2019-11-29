@@ -14,12 +14,12 @@ verify that `g++ --version` shows 7+.  might be a good idea to enable devtoolset
 
 i also created a mysql database named `test`.  the db name appears to also be the schema name...  not sure how that works in mysql but also not the point of this exercise so i just accepted it and moved on.  i left the root password blank.  don't do that if you plan to leave the service up and running or if you plan to put meaningful data in there.
 
-after you install mysql the server on your system, and this writeup doesn't cover that, and connect to it.  however, for centos, i did do a `sudo yum -y install mysql-community*` then do the following:
+after you install mysql the server on your system, and this writeup doesn't cover that, and connect to it. then do the following at the mysql prompt:
 
 create the table:
 
 ```
-CREATE TABLE cus_tbl(  
+mysql> CREATE TABLE cus_tbl(  
    customer_id INT NOT NULL AUTO_INCREMENT,  
    firstname VARCHAR(100) NOT NULL,  
    lastname VARCHAR(100) NOT NULL,  
@@ -30,7 +30,7 @@ CREATE TABLE cus_tbl(
 put some data in there:
 
 ```
-INSERT INTO cus_tbl (firstname, lastname) VALUES ('homer', 'simpson');
+mysql> INSERT INTO cus_tbl (firstname, lastname) VALUES ('homer', 'simpson');
 ```
 
 repeat for as many entries in the table as you like.  you'll also note we skipped the `customer_id` because that's an auto increment so it'll insert itself.
