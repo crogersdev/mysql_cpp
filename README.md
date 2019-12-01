@@ -8,9 +8,9 @@ this was all run on centos7.  i wanted to use gcc 7, so i had to do the followin
 $ sudo yum install centos-release-scl
 $ sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
 $ sudo yum install devtoolset-7
-$ scl enable devtoolset-7 $SHELL
+$ scl enable devtoolset-7 bash # or zsh, as the case may be
 ```
-verify that `g++ --version` shows 7+.  might be a good idea to enable devtoolset-7 in ~/.zshrc or ~/.bashrc or whatever the shell is you use.
+verify that `g++ --version` shows 7+.
 
 i also created a mysql database named `test`.  the db name appears to also be the schema name...  not sure how that works in mysql but also not the point of this exercise so i just accepted it and moved on.  i left the root password blank.  don't do that if you plan to leave the service up and running or if you plan to put meaningful data in there.
 
